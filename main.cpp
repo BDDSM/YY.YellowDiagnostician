@@ -1,6 +1,7 @@
 #include <iostream>
 #include "windows.h"
 #include <Lmcons.h>
+#include <thread>
 
 #define INFO_BUFFER_SIZE 32767
 
@@ -26,6 +27,17 @@ int main() {
         std::cout << buffer;
         std::cout << std::endl;
     }
+
+    DWORD procId;
+    procId = GetCurrentProcessId();
+    std::cout << "Process ID: ";
+    std::cout << procId;
+    std::cout << std::endl;
+
+    std::thread::id this_id = std::this_thread::get_id();
+    std::cout << "Thread ID: ";
+    std::cout << this_id;
+    std::cout << std::endl;
 
     std::cout << "Press any key for exit...";
     std::getchar();
