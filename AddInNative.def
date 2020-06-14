@@ -1,0 +1,7 @@
+LIBRARY    "AddInNativeWin32_02"
+
+EXPORTS
+GetClassObject
+DestroyObject
+GetClassNames
+SetPlatformCapabilities
