@@ -1,5 +1,5 @@
 #include <iostream>
-#include "Diagnostic.h"
+#include "lib/Diagnostic.h"
 
 int main() {
 

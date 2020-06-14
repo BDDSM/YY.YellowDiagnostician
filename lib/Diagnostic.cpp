@@ -15,7 +15,9 @@ namespace yy
 #endif
 		
 #if defined( __linux__ )
-        gethostname(hostname, HOST_NAME_MAX);
+        char valueHostname[HOST_NAME_MAX];
+        gethostname(valueHostname, HOST_NAME_MAX);
+        hostname = valueHostname;
 #endif
 
         return hostname;
