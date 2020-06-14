@@ -3,4 +3,4 @@ project(YY_DiagnosticAppExtended)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(YY_DiagnosticAppExtended main.cpp)
+add_executable(YY_DiagnosticAppExtended main.cpp Diagnostic.cpp Diagnostic.h)
