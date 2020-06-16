@@ -1,9 +1,9 @@
 ﻿#ifndef __ADDINNATIVE_H__
 #define __ADDINNATIVE_H__
 
-#include "include/ComponentBase.h"
-#include "include/AddInDefBase.h"
-#include "include/IMemoryManager.h"
+#include "ComponentBase.h"
+#include "AddInDefBase.h"
+#include "IMemoryManager.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // class CAddInNative
@@ -27,6 +27,8 @@ public:
         eMethLoadPicture,
         eMethShowMsgBox,
 		eLoopback,
+        eThreadId,
+        eProcessId,
         eMethLast      // Always last
     };
 

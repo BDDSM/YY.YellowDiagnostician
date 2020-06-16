@@ -20,8 +20,8 @@
 
 namespace yy
 {
-	std::string GetHost();
-	std::string GetUser();
-	int GetProcessId();
-	int GetThreadId();
+	std::string get_host();
+	std::string get_user();
+	int get_process_id();
+	int get_thread_id();
 }

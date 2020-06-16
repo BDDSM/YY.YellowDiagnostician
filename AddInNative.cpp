@@ -19,6 +19,7 @@
 #include <locale.h>
 #include "AddInNative.h"
 #include <string>
+#include "Diagnostic.h"
 
 #define TIME_LEN 65
 
@@ -40,7 +41,9 @@ static const wchar_t *g_MethodNames[] = {
     L"StopTimer", 
     L"LoadPicture", 
     L"ShowMessageBox", 
-    L"Loopback"
+    L"Loopback",
+    L"GetThreadId",
+    L"GetProcessId"
 };
 
 static const wchar_t *g_PropNamesRu[] = {
@@ -55,7 +58,9 @@ static const wchar_t *g_MethodNamesRu[] = {
     L"СтопТаймер", 
     L"ЗагрузитьКартинку", 
     L"ПоказатьСообщение", 
-    L"Петля"
+    L"Петля",
+    L"ПолучитьИдентификаторПотока",
+    L"ПолучитьИдентификаторПроцесса"
 };
 
 static const wchar_t g_kClassNames[] = L"CAddInNative"; //"|OtherClass1|OtherClass2";
@@ -344,6 +349,10 @@ long CAddInNative::GetNParams(const long lMethodNum)
         return 1;
     case eLoopback:
         return 1;
+    case eThreadId:
+        return 0;
+    case eProcessId:
+        return 0;
     default:
         return 0;
     }
@@ -380,6 +389,10 @@ bool CAddInNative::HasRetVal(const long lMethodNum)
     case eMethLoadPicture:
     case eLoopback:
         return true;
+    case eThreadId:
+        return true;
+    case eProcessId:
+        return true;
     default:
         return false;
     }
@@ -391,7 +404,7 @@ bool CAddInNative::CallAsProc(const long lMethodNum,
                     tVariant* paParams, const long lSizeArray)
 { 
     switch(lMethodNum)
-    { 
+    {
     case eMethEnable:
         m_boolEnabled = true;
         break;
@@ -496,6 +509,7 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
 
     switch(lMethodNum)
     {
+    	
         // Method acceps one argument of type BinaryData ant returns its copy
         case eLoopback:
         {
@@ -520,7 +534,23 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
         }
         break;
 
-    case eMethLoadPicture:
+        case eThreadId:
+        {
+            TV_VT(pvarRetValue) = VTYPE_I4;
+            pvarRetValue->intVal = yy::get_thread_id();           
+        		
+            return true;
+        }
+
+        case eProcessId:
+        {
+            TV_VT(pvarRetValue) = VTYPE_I4;
+            pvarRetValue->intVal = yy::get_process_id();
+
+            return true;
+        }
+
+		case eMethLoadPicture:
         {
             if (!lSizeArray || !paParams)
                 return false;

@@ -1,5 +1,5 @@
 #include <iostream>
-#include "lib/Diagnostic.h"
+#include "Diagnostic.h"
 
 int main() {
 
@@ -7,20 +7,19 @@ int main() {
     std::cout << std::endl;
 
     std::cout << "Computer name: ";
-    std::cout << yy::GetHost();
+    std::cout << yy::get_host();
     std::cout << std::endl;
 
     std::cout << "User name: ";
-    std::cout << yy::GetUser();
+    std::cout << yy::get_user();
     std::cout << std::endl;
 
     std::cout << "Process ID: ";
-    std::cout << yy::GetProcessId();
+    std::cout << yy::get_process_id();
     std::cout << std::endl;
 
-    std::thread::id this_id = std::this_thread::get_id();
     std::cout << "Thread ID: ";
-    std::cout << yy::GetThreadId();
+    std::cout << yy::get_thread_id();
     std::cout << std::endl;
 
     std::cout << "Press any key for exit...";
