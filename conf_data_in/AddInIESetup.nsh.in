@@ -1,0 +1,17 @@
+
+!ifndef ADDINCONST_INCLUDED
+
+!define ADDINCONST_INCLUDED
+!define Version   "@Addn_VERSION@" 
+!define ProductVersion   "${Version}" 
+!define Product   "@PRODUCT@" 
+!define Manufacturer   "@MYCOMPANY@"
+!define CompanyURL   "www.@MYCOMPANY@.com"
+!define Description   "Setup AddIn extension for Internet Explorer"
+!define AddInAdaptor "@ADAPTER@"
+!define AddInComponent "@EXCOMP@"
+!define Bits   "@ADD_BITS@"
+!define SuffixPF   "@ADD_SUFFIX@"
+!define OutFileName "@OUTFILENAME@"
+!define ProductName   "AddIn example extension for Internet Explorer" 
+!endif

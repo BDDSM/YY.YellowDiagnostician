@@ -1,0 +1,10 @@
+{
+  "name": "@Addn_Mainfest@",
+  "description": "@Addn_Native@ extension for Firefox",
+  "path": "@ADAPTER@",
+  "type": "stdio",
+  "allowed_extensions": [
+    "1centext_ff@1c.ru",
+    "baf.dev.com@gmail.com"
+    ]
+}

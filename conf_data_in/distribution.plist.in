@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <title>@ADN_NAME@</title>
+    <options rootVolumeOnly="true"/>
+    <pkg-ref id="@Addn_Mainfest@.chr"/>
+    <pkg-ref id="@Addn_Mainfest@.ff"/>
+    <pkg-ref id="@Addn_Mainfest@.webext"/>
+    <options customize="never" require-scripts="false"/>
+    <choices-outline>
+        <line choice="default">
+            <line choice="@Addn_Mainfest@.chr"/>
+            <line choice="@Addn_Mainfest@.ff"/>
+            <line choice="@Addn_Mainfest@.webext"/>
+        </line>
+    </choices-outline>
+    <choice id="default"/>
+    <choice id="@Addn_Mainfest@.chr" visible="false">
+        <pkg-ref id="@Addn_Mainfest@.chr"/>
+    </choice>
+    <pkg-ref id="@Addn_Mainfest@.chr" version="8.3.0.@ADDNVER@" onConclusion="none">chrome.pkg</pkg-ref>
+    <choice id="@Addn_Mainfest@.ff" visible="false">
+        <pkg-ref id="@Addn_Mainfest@.ff"/>
+    </choice>
+    <pkg-ref id="@Addn_Mainfest@.ff" version="8.3.0.@ADDNVER@" onConclusion="none">ff.pkg</pkg-ref>
+    <choice id="@Addn_Mainfest@.webext" visible="false">
+        <pkg-ref id="@Addn_Mainfest@.webext"/>
+    </choice>
+    <pkg-ref id="@Addn_Mainfest@.webext" version="8.3.0.@ADDNVER@" onConclusion="none">@ADN_NAME@.pkg</pkg-ref>
+</installer-gui-script>

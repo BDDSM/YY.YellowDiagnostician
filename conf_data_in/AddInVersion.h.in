@@ -1,0 +1,6 @@
+﻿
+#cmakedefine ADDNVER "@ADDNVER@"
+#cmakedefine MIMETYPE "@Addn_MimeType@"
+#cmakedefine ADDNCHROME "@Addn_Chrome@"
+#cmakedefine ADDNNATIVE "@Addn_Native@"
+#cmakedefine ADDNIE "@Addn_IE@"
