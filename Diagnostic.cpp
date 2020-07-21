@@ -65,7 +65,7 @@ namespace yy
 #endif
 
 #if defined( __linux__ )
-        processId = ::getpid();
+        process_id = ::getpid();
 #endif
 
         return process_id;

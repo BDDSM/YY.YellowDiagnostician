@@ -16,9 +16,14 @@ IF(WIN32)
     ENABLE_LANGUAGE(RC)
 ENDIF()
 
+add_executable(YY_DiagnosticAppExtended main.cpp Diagnostic.cpp Diagnostic.h)
+add_library(YY_Diagnostic Diagnostic.cpp Diagnostic.h)
+
 #----------------------------------------------------------------------------------------------------------------#
 #--source files-------------------
 SET(AddInNative_SRC
+        Diagnostic.cpp
+        Diagnostic.h
         AddInNative.cpp
         AddInNative.h
         dllmain.cpp
@@ -104,14 +109,14 @@ if(UNIX AND NOT APPLE)
     if (STRIP)
         SET(STRIP_CMD ${STRIP} $<TARGET_FILE:${PROJECT_NAME}> -f ${PDB_DIR}/$<TARGET_FILE_NAME:${PROJECT_NAME}>.debug)
     endif()
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-            COMMAND ${STRIP_CMD}
-            COMMAND ${CMAKE_COMMAND} -E make_directory ${TMP_DIR}
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${TMP_DIR}/
-            COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PKG_OUTPUT_DIR}/
-            COMMENT "Copy ${PROJECT_NAME}"
-            MAIN_DEPENDENCY ${PROJECT_NAME}
-            )
+    #add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    #        COMMAND ${STRIP_CMD}
+    #        COMMAND ${CMAKE_COMMAND} -E make_directory ${TMP_DIR}
+    #        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${TMP_DIR}/
+    #        COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PKG_OUTPUT_DIR}/
+    #        COMMENT "Copy ${PROJECT_NAME}"
+    #        MAIN_DEPENDENCY ${PROJECT_NAME}
+    #        )
 elseif(APPLE)
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PKG_OUTPUT_DIR}/
@@ -129,7 +134,7 @@ elseif(WIN32)
         SET(SIGN_CMD1)
         SET(SIGN_CMD2)
     endif()
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
             COMMAND ${SIGN_CMD1}
             COMMAND ${SIGN_CMD2}
             COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${PROJECT_NAME}> ${PKG_OUTPUT_DIR}/
@@ -138,6 +143,3 @@ elseif(WIN32)
             MAIN_DEPENDENCY ${PROJECT_NAME}
             )
 endif()
-
-add_executable(YY_DiagnosticAppExtended main.cpp Diagnostic.cpp Diagnostic.h)
-add_library(YY_Diagnostic Diagnostic.cpp Diagnostic.h)
