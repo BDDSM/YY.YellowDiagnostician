@@ -43,7 +43,9 @@ static const wchar_t *g_MethodNames[] = {
     L"ShowMessageBox", 
     L"Loopback",
     L"GetThreadId",
-    L"GetProcessId"
+    L"GetProcessId",
+    L"GetUserName",
+    L"GetHostName"
 };
 
 static const wchar_t *g_PropNamesRu[] = {
@@ -60,7 +62,9 @@ static const wchar_t *g_MethodNamesRu[] = {
     L"ПоказатьСообщение", 
     L"Петля",
     L"ПолучитьИдентификаторПотока",
-    L"ПолучитьИдентификаторПроцесса"
+    L"ПолучитьИдентификаторПроцесса",
+    L"ПолучитьИмяПользователя",
+    L"ПолучитьИмяКомпьютера"
 };
 
 static const wchar_t g_kClassNames[] = L"CAddInNative"; //"|OtherClass1|OtherClass2";
@@ -353,6 +357,10 @@ long CAddInNative::GetNParams(const long lMethodNum)
         return 0;
     case eProcessId:
         return 0;
+    case eUserName:
+        return 0;
+    case eHostName:
+        return 0;
     default:
         return 0;
     }
@@ -392,6 +400,10 @@ bool CAddInNative::HasRetVal(const long lMethodNum)
     case eThreadId:
         return true;
     case eProcessId:
+        return true;
+    case eUserName:
+        return true;
+    case eHostName:
         return true;
     default:
         return false;
@@ -546,6 +558,32 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
         {
             TV_VT(pvarRetValue) = VTYPE_I4;
             pvarRetValue->intVal = yy::get_process_id();
+
+            return true;
+        }
+
+        case eHostName:
+        {
+	        const std::string host_name = yy::get_host();
+            const char* host_name_char = host_name.c_str();
+
+            TV_VT(pvarRetValue) = VTYPE_PSTR;
+            pvarRetValue->strLen = strnlen(host_name_char, 250);
+            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvarRetValue->pstrVal), pvarRetValue->strLen);
+            strncpy(pvarRetValue->pstrVal, host_name_char, pvarRetValue->strLen);
+
+            return true;
+        }
+
+        case eUserName:
+        {
+            std::string user_name = yy::get_user();
+            const char* user_name_char = user_name.c_str();
+
+            TV_VT(pvarRetValue) = VTYPE_PSTR;
+            pvarRetValue->strLen = strnlen(user_name_char, 250);
+            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvarRetValue->pstrVal), pvarRetValue->strLen);
+            strncpy(pvarRetValue->pstrVal, user_name_char, pvarRetValue->strLen);
 
             return true;
         }

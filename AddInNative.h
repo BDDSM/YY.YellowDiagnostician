@@ -29,6 +29,8 @@ public:
 		eLoopback,
         eThreadId,
         eProcessId,
+        eUserName,
+        eHostName,
         eMethLast      // Always last
     };
 
