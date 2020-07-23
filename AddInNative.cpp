@@ -14,11 +14,11 @@
 #endif
 
 
-#include <stdio.h>
-#include <wchar.h>
-#include <locale.h>
-#include "AddInNative.h"
+#include <cstdio>
+#include <cwchar>
+#include <clocale>
 #include <string>
+#include "AddInNative.h"
 #include "Diagnostic.h"
 
 #define TIME_LEN 65
@@ -29,7 +29,7 @@
 #pragma setlocale("ru-RU" )
 #endif
 
-static const wchar_t *g_PropNames[] = {0};
+static const wchar_t *g_PropNames[] = {nullptr};
 static const wchar_t *g_MethodNames[] = {
     L"GetThreadId",
     L"GetProcessId",
@@ -37,7 +37,7 @@ static const wchar_t *g_MethodNames[] = {
     L"GetHostName"
 };
 
-static const wchar_t *g_PropNamesRu[] = {0};
+static const wchar_t *g_PropNamesRu[] = {nullptr};
 static const wchar_t *g_MethodNamesRu[] = {
     L"ПолучитьИдентификаторПотока",
     L"ПолучитьИдентификаторПроцесса",
@@ -46,7 +46,7 @@ static const wchar_t *g_MethodNamesRu[] = {
 };
 
 static const wchar_t g_kClassNames[] = L"CAddInNative";
-static IAddInDefBase *pAsyncEvent = NULL;
+static IAddInDefBase *pAsyncEvent = nullptr;
 
 uint32_t convToShortWchar(WCHAR_T** Dest, const wchar_t* Source, uint32_t len = 0);
 uint32_t convFromShortWchar(wchar_t** Dest, const WCHAR_T* Source, uint32_t len = 0);
@@ -102,13 +102,11 @@ CAddInNative::CAddInNative()
 #endif //__linux__
 }
 //---------------------------------------------------------------------------//
-CAddInNative::~CAddInNative()
-{
-}
+CAddInNative::~CAddInNative() = default;
 //---------------------------------------------------------------------------//
 bool CAddInNative::Init(void* pConnection)
 { 
-    m_iConnect = (IAddInDefBase*)pConnection;
+    m_iConnect = static_cast<IAddInDefBase*>(pConnection);
     return m_iConnect != NULL;
 }
 //---------------------------------------------------------------------------//
@@ -134,14 +132,14 @@ void CAddInNative::Done()
 //---------------------------------------------------------------------------//
 bool CAddInNative::RegisterExtensionAs(WCHAR_T** wsExtensionName)
 { 
-    const wchar_t *wsExtension = L"AddInNativeExtension";
-    int iActualSize = ::wcslen(wsExtension) + 1;
+    const wchar_t *wsExtension = L"YellowDiagnostician";
+    const int i_actual_size = ::wcslen(wsExtension) + 1;
     WCHAR_T* dest = 0;
 
     if (m_iMemory)
     {
-        if(m_iMemory->AllocMemory((void**)wsExtensionName, iActualSize * sizeof(WCHAR_T)))
-            ::convToShortWchar(wsExtensionName, wsExtension, iActualSize);
+        if(m_iMemory->AllocMemory(reinterpret_cast<void**>(wsExtensionName), i_actual_size * sizeof(WCHAR_T)))
+            ::convToShortWchar(wsExtensionName, wsExtension, i_actual_size);
         return true;
     }
 
@@ -175,17 +173,17 @@ const WCHAR_T* CAddInNative::GetPropName(long lPropNum, long lPropAlias)
     if (lPropNum >= ePropLast)
         return NULL;
 
-    wchar_t *wsCurrentName = NULL;
-    WCHAR_T *wsPropName = NULL;
+    wchar_t *wsCurrentName = nullptr;
+    WCHAR_T *wsPropName = nullptr;
     int iActualSize = 0;
 
     switch(lPropAlias)
     {
     case 0: // First language
-        wsCurrentName = (wchar_t*)g_PropNames[lPropNum];
+        wsCurrentName = const_cast<wchar_t*>(g_PropNames[lPropNum]);
         break;
     case 1: // Second language
-        wsCurrentName = (wchar_t*)g_PropNamesRu[lPropNum];
+        wsCurrentName = const_cast<wchar_t*>(g_PropNamesRu[lPropNum]);
         break;
     default:
         return 0;
@@ -195,7 +193,7 @@ const WCHAR_T* CAddInNative::GetPropName(long lPropNum, long lPropAlias)
 
     if (m_iMemory && wsCurrentName)
     {
-        if (m_iMemory->AllocMemory((void**)&wsPropName, iActualSize * sizeof(WCHAR_T)))
+        if (m_iMemory->AllocMemory(reinterpret_cast<void**>(&wsPropName), iActualSize * sizeof(WCHAR_T)))
             ::convToShortWchar(&wsPropName, wsCurrentName, iActualSize);
     }
 
@@ -253,8 +251,8 @@ long CAddInNative::GetNMethods()
 //---------------------------------------------------------------------------//
 long CAddInNative::FindMethod(const WCHAR_T* wsMethodName)
 { 
-    long plMethodNum = -1;
-    wchar_t* name = 0;
+    long plMethodNum;
+    wchar_t* name = nullptr;
 
     ::convFromShortWchar(&name, wsMethodName);
 
@@ -273,17 +271,17 @@ const WCHAR_T* CAddInNative::GetMethodName(const long lMethodNum, const long lMe
     if (lMethodNum >= eMethLast)
         return NULL;
 
-    wchar_t *wsCurrentName = NULL;
-    WCHAR_T *wsMethodName = NULL;
+    wchar_t *wsCurrentName = nullptr;
+    WCHAR_T *wsMethodName = nullptr;
     int iActualSize = 0;
 
     switch(lMethodAlias)
     {
     case 0: // First language
-        wsCurrentName = (wchar_t*)g_MethodNames[lMethodNum];
+        wsCurrentName = const_cast<wchar_t*>(g_MethodNames[lMethodNum]);
         break;
     case 1: // Second language
-        wsCurrentName = (wchar_t*)g_MethodNamesRu[lMethodNum];
+        wsCurrentName = const_cast<wchar_t*>(g_MethodNamesRu[lMethodNum]);
         break;
     default: 
         return 0;
@@ -293,7 +291,7 @@ const WCHAR_T* CAddInNative::GetMethodName(const long lMethodNum, const long lMe
 
     if (m_iMemory && wsCurrentName)
     {
-        if(m_iMemory->AllocMemory((void**)&wsMethodName, iActualSize * sizeof(WCHAR_T)))
+        if(m_iMemory->AllocMemory(reinterpret_cast<void**>(&wsMethodName), iActualSize * sizeof(WCHAR_T)))
             ::convToShortWchar(&wsMethodName, wsCurrentName, iActualSize);
     }
 
@@ -320,9 +318,9 @@ long CAddInNative::GetNParams(const long lMethodNum)
 }
 //---------------------------------------------------------------------------//
 bool CAddInNative::GetParamDefValue(const long lMethodNum, const long lParamNum,
-                        tVariant *pvarParamDefValue)
+                        tVariant *pvar_param_def_value)
 { 
-    TV_VT(pvarParamDefValue)= VTYPE_EMPTY;
+    TV_VT(pvar_param_def_value)= VTYPE_EMPTY;
 
     switch(lMethodNum)
     { 
@@ -365,22 +363,22 @@ bool CAddInNative::CallAsProc(const long lMethodNum,
 }
 //---------------------------------------------------------------------------//
 bool CAddInNative::CallAsFunc(const long lMethodNum,
-                tVariant* pvarRetValue, tVariant* paParams, const long lSizeArray)
+                tVariant* pvar_ret_value, tVariant* paParams, const long lSizeArray)
 { 
     switch(lMethodNum)
     {
         case eThreadId:
         {
-            TV_VT(pvarRetValue) = VTYPE_I4;
-            pvarRetValue->intVal = yy::get_thread_id();           
+            TV_VT(pvar_ret_value) = VTYPE_I4;
+            pvar_ret_value->intVal = yy::get_thread_id();           
         		
             return true;
         }
 
         case eProcessId:
         {
-            TV_VT(pvarRetValue) = VTYPE_I4;
-            pvarRetValue->intVal = yy::get_process_id();
+            TV_VT(pvar_ret_value) = VTYPE_I4;
+            pvar_ret_value->intVal = yy::get_process_id();
 
             return true;
         }
@@ -390,10 +388,10 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
 	        const std::string host_name = yy::get_host();
             const char* host_name_char = host_name.c_str();
 
-            TV_VT(pvarRetValue) = VTYPE_PSTR;
-            pvarRetValue->strLen = strnlen(host_name_char, 250);
-            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvarRetValue->pstrVal), pvarRetValue->strLen);
-            strncpy(pvarRetValue->pstrVal, host_name_char, pvarRetValue->strLen);
+            TV_VT(pvar_ret_value) = VTYPE_PSTR;
+            pvar_ret_value->strLen = strnlen(host_name_char, 250);
+            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvar_ret_value->pstrVal), pvar_ret_value->strLen);
+            strncpy(pvar_ret_value->pstrVal, host_name_char, pvar_ret_value->strLen);
 
             return true;
         }
@@ -403,10 +401,10 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
             std::string user_name = yy::get_user();
             const char* user_name_char = user_name.c_str();
 
-            TV_VT(pvarRetValue) = VTYPE_PSTR;
-            pvarRetValue->strLen = strnlen(user_name_char, 250);
-            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvarRetValue->pstrVal), pvarRetValue->strLen);
-            strncpy(pvarRetValue->pstrVal, user_name_char, pvarRetValue->strLen);
+            TV_VT(pvar_ret_value) = VTYPE_PSTR;
+            pvar_ret_value->strLen = strnlen(user_name_char, 250);
+            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvar_ret_value->pstrVal), pvar_ret_value->strLen);
+            strncpy(pvar_ret_value->pstrVal, user_name_char, pvar_ret_value->strLen);
 
             return true;
         }		
@@ -421,7 +419,7 @@ VOID CALLBACK MyTimerProc(PVOID lpParam, BOOLEAN TimerOrWaitFired)
 {
     if (!pAsyncEvent)
         return;
-    DWORD dwTime = 0;
+	
     wchar_t *who = L"ComponentNative", *what = L"Timer";
 
     wchar_t *wstime = new wchar_t[TIME_LEN];
@@ -480,7 +478,7 @@ void CAddInNative::SetLocale(const WCHAR_T* loc)
 //---------------------------------------------------------------------------//
 bool CAddInNative::setMemManager(void* mem)
 {
-    m_iMemory = (IMemoryManager*)mem;
+    m_iMemory = static_cast<IMemoryManager*>(mem);
     return m_iMemory != 0;
 }
 //---------------------------------------------------------------------------//
@@ -525,7 +523,7 @@ uint32_t convToShortWchar(WCHAR_T** Dest, const wchar_t* Source, uint32_t len)
         *Dest = new WCHAR_T[len];
 
     WCHAR_T* tmpShort = *Dest;
-    wchar_t* tmpWChar = (wchar_t*) Source;
+    wchar_t* tmpWChar = const_cast<wchar_t*>(Source);
     uint32_t res = 0;
 
     ::memset(*Dest, 0, len * sizeof(WCHAR_T));
@@ -544,7 +542,7 @@ uint32_t convToShortWchar(WCHAR_T** Dest, const wchar_t* Source, uint32_t len)
 #endif //__linux__
     for (; len; --len, ++res, ++tmpWChar, ++tmpShort)
     {
-        *tmpShort = (WCHAR_T)*tmpWChar;
+        *tmpShort = static_cast<WCHAR_T>(*tmpWChar);
     }
 
     return res;
@@ -559,7 +557,7 @@ uint32_t convFromShortWchar(wchar_t** Dest, const WCHAR_T* Source, uint32_t len)
         *Dest = new wchar_t[len];
 
     wchar_t* tmpWChar = *Dest;
-    WCHAR_T* tmpShort = (WCHAR_T*)Source;
+    WCHAR_T* tmpShort = const_cast<WCHAR_T*>(Source);
     uint32_t res = 0;
 
     ::memset(*Dest, 0, len * sizeof(wchar_t));
@@ -578,7 +576,7 @@ uint32_t convFromShortWchar(wchar_t** Dest, const WCHAR_T* Source, uint32_t len)
 #endif //__linux__
     for (; len; --len, ++res, ++tmpWChar, ++tmpShort)
     {
-        *tmpWChar = (wchar_t)*tmpShort;
+        *tmpWChar = static_cast<wchar_t>(*tmpShort);
     }
 
     return res;
@@ -587,7 +585,7 @@ uint32_t convFromShortWchar(wchar_t** Dest, const WCHAR_T* Source, uint32_t len)
 uint32_t getLenShortWcharStr(const WCHAR_T* Source)
 {
     uint32_t res = 0;
-    WCHAR_T *tmpShort = (WCHAR_T*)Source;
+    WCHAR_T *tmpShort = const_cast<WCHAR_T*>(Source);
 
     while (*tmpShort++)
         ++res;
@@ -615,7 +613,7 @@ WcharWrapper::WcharWrapper(const wchar_t* str) :
 #ifdef LINUX_OR_MACOS
     m_str_WCHAR(NULL),
 #endif 
-    m_str_wchar(NULL)
+    m_str_wchar(nullptr)
 {
     if (str)
     {
@@ -642,7 +640,7 @@ WcharWrapper::~WcharWrapper()
     if (m_str_wchar)
     {
         delete [] m_str_wchar;
-        m_str_wchar = NULL;
+        m_str_wchar = nullptr;
     }
 }
 //---------------------------------------------------------------------------//

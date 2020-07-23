@@ -46,12 +46,12 @@ public:
                             const long lMethodAlias);
     virtual long ADDIN_API GetNParams(const long lMethodNum);
     virtual bool ADDIN_API GetParamDefValue(const long lMethodNum, const long lParamNum,
-                            tVariant *pvarParamDefValue);   
+                            tVariant *pvar_param_def_value);   
     virtual bool ADDIN_API HasRetVal(const long lMethodNum);
     virtual bool ADDIN_API CallAsProc(const long lMethodNum,
                     tVariant* paParams, const long lSizeArray);
     virtual bool ADDIN_API CallAsFunc(const long lMethodNum,
-                tVariant* pvarRetValue, tVariant* paParams, const long lSizeArray);
+                tVariant* pvar_ret_value, tVariant* paParams, const long lSizeArray);
     // LocaleBase
     virtual void ADDIN_API SetLocale(const WCHAR_T* loc);
     
@@ -63,10 +63,10 @@ private:
     IAddInDefBase      *m_iConnect;
     IMemoryManager     *m_iMemory;
 
-    bool                m_boolEnabled;
-    uint32_t            m_uiTimer;
+    bool                m_boolEnabled{};
+    uint32_t            m_uiTimer{};
 #if !defined( __linux__ ) && !defined(__APPLE__)
-    HANDLE              m_hTimer;
+    HANDLE              m_hTimer{};
     HANDLE              m_hTimerQueue;
 #endif //__linux__
 };
