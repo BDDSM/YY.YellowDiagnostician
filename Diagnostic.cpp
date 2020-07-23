@@ -1,5 +1,9 @@
 #include "Diagnostic.h"
 
+
+#include <codecvt>
+#include <locale>
+
 namespace yy
 {	
 	std::string get_host()
@@ -79,4 +83,45 @@ namespace yy
 
         return thread_id;
     }
+
+	std::string get_process_name()
+	{
+#ifdef WIN32		
+        //char cCurrentPath[FILENAME_MAX];
+
+        //if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
+        //{
+        //    return nullptr;
+        //}
+
+        //cCurrentPath[sizeof(cCurrentPath) - 1] = '/0';
+
+        //return cCurrentPath;
+
+        wchar_t buffer[MAX_PATH];
+        GetModuleFileName(NULL, buffer, MAX_PATH);
+
+        //setup converter
+        using convert_type = std::codecvt_utf8<wchar_t>;
+        std::wstring_convert<convert_type, wchar_t> converter;
+
+        //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
+        std::string converted_str = converter.to_bytes(buffer);
+		
+        return converted_str;
+		
+#endif
+
+#if defined( __linux__ )
+        char szTmp[32];
+        sprintf(szTmp, "/proc/%d/exe", getpid());
+        int bytes = MIN(readlink(szTmp, pBuf, len), len - 1);
+        if (bytes >= 0)
+            pBuf[bytes] = '\0';
+        return bytes;
+#endif
+
+        return nullptr;
+	}
+
 }

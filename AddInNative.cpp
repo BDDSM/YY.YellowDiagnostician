@@ -34,7 +34,8 @@ static const wchar_t *g_MethodNames[] = {
     L"GetThreadId",
     L"GetProcessId",
     L"GetUserName",
-    L"GetHostName"
+    L"GetHostName",
+    L"GetProcessName",
 };
 
 static const wchar_t *g_PropNamesRu[] = {nullptr};
@@ -42,7 +43,8 @@ static const wchar_t *g_MethodNamesRu[] = {
     L"ПолучитьИдентификаторПотока",
     L"ПолучитьИдентификаторПроцесса",
     L"ПолучитьИмяПользователя",
-    L"ПолучитьИмяКомпьютера"
+    L"ПолучитьИмяКомпьютера",
+    L"ПолучитьИмяПроцесса"
 };
 
 static const wchar_t g_kClassNames[] = L"CAddInNative";
@@ -310,6 +312,8 @@ long CAddInNative::GetNParams(const long lMethodNum)
         return 0;
     case eHostName:
         return 0;
+    case eProcessName:
+        return 0;
     default:
         return 0;
     }
@@ -342,6 +346,8 @@ bool CAddInNative::HasRetVal(const long lMethodNum)
     case eUserName:
         return true;
     case eHostName:
+        return true;
+    case eProcessName:
         return true;
     default:
         return false;
@@ -389,7 +395,7 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
             const char* host_name_char = host_name.c_str();
 
             TV_VT(pvar_ret_value) = VTYPE_PSTR;
-            pvar_ret_value->strLen = strnlen(host_name_char, 250);
+            pvar_ret_value->strLen = strnlen(host_name_char, 1024);
             m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvar_ret_value->pstrVal), pvar_ret_value->strLen);
             strncpy(pvar_ret_value->pstrVal, host_name_char, pvar_ret_value->strLen);
 
@@ -402,12 +408,25 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
             const char* user_name_char = user_name.c_str();
 
             TV_VT(pvar_ret_value) = VTYPE_PSTR;
-            pvar_ret_value->strLen = strnlen(user_name_char, 250);
+            pvar_ret_value->strLen = strnlen(user_name_char, 1024);
             m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvar_ret_value->pstrVal), pvar_ret_value->strLen);
             strncpy(pvar_ret_value->pstrVal, user_name_char, pvar_ret_value->strLen);
 
             return true;
-        }		
+        }
+
+        case eProcessName:
+        {
+            std::string process_name = yy::get_process_name();
+            const char* process_name_char = process_name.c_str();
+
+            TV_VT(pvar_ret_value) = VTYPE_PSTR;
+            pvar_ret_value->strLen = strnlen(process_name_char, 1024);
+            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvar_ret_value->pstrVal), pvar_ret_value->strLen);
+            strncpy(pvar_ret_value->pstrVal, process_name_char, pvar_ret_value->strLen);
+
+            return true;
+        }
     }
 	
     return false; 
