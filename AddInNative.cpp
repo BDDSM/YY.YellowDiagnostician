@@ -23,51 +23,29 @@
 
 #define TIME_LEN 65
 
-#define BASE_ERRNO     7
+#define BASE_ERRNO 7
 
 #ifdef WIN32
 #pragma setlocale("ru-RU" )
 #endif
 
-static const wchar_t *g_PropNames[] = {
-    L"IsEnabled", 
-    L"IsTimerPresent"
-};
+static const wchar_t *g_PropNames[] = {0};
 static const wchar_t *g_MethodNames[] = {
-    L"Enable", 
-    L"Disable", 
-    L"ShowInStatusLine",
-    L"StartTimer", 
-    L"StopTimer", 
-    L"LoadPicture", 
-    L"ShowMessageBox", 
-    L"Loopback",
     L"GetThreadId",
     L"GetProcessId",
     L"GetUserName",
     L"GetHostName"
 };
 
-static const wchar_t *g_PropNamesRu[] = {
-    L"Включен", 
-    L"ЕстьТаймер"
-};
+static const wchar_t *g_PropNamesRu[] = {0};
 static const wchar_t *g_MethodNamesRu[] = {
-    L"Включить", 
-    L"Выключить", 
-    L"ПоказатьВСтрокеСтатуса", 
-    L"СтартТаймер", 
-    L"СтопТаймер", 
-    L"ЗагрузитьКартинку", 
-    L"ПоказатьСообщение", 
-    L"Петля",
     L"ПолучитьИдентификаторПотока",
     L"ПолучитьИдентификаторПроцесса",
     L"ПолучитьИмяПользователя",
     L"ПолучитьИмяКомпьютера"
 };
 
-static const wchar_t g_kClassNames[] = L"CAddInNative"; //"|OtherClass1|OtherClass2";
+static const wchar_t g_kClassNames[] = L"CAddInNative";
 static IAddInDefBase *pAsyncEvent = NULL;
 
 uint32_t convToShortWchar(WCHAR_T** Dest, const wchar_t* Source, uint32_t len = 0);
@@ -228,16 +206,8 @@ bool CAddInNative::GetPropVal(const long lPropNum, tVariant* pvarPropVal)
 { 
     switch(lPropNum)
     {
-    case ePropIsEnabled:
-        TV_VT(pvarPropVal) = VTYPE_BOOL;
-        TV_BOOL(pvarPropVal) = m_boolEnabled;
-        break;
-    case ePropIsTimerPresent:
-        TV_VT(pvarPropVal) = VTYPE_BOOL;
-        TV_BOOL(pvarPropVal) = true;
-        break;
-    default:
-        return false;
+	default:
+	    return false;
     }
 
     return true;
@@ -247,14 +217,8 @@ bool CAddInNative::SetPropVal(const long lPropNum, tVariant *varPropVal)
 { 
     switch(lPropNum)
     { 
-    case ePropIsEnabled:
-        if (TV_VT(varPropVal) != VTYPE_BOOL)
-            return false;
-        m_boolEnabled = TV_BOOL(varPropVal);
-        break;
-    case ePropIsTimerPresent:
-    default:
-        return false;
+	default:
+	    return false;
     }
 
     return true;
@@ -264,9 +228,6 @@ bool CAddInNative::IsPropReadable(const long lPropNum)
 { 
     switch(lPropNum)
     { 
-    case ePropIsEnabled:
-    case ePropIsTimerPresent:
-        return true;
     default:
         return false;
     }
@@ -276,12 +237,8 @@ bool CAddInNative::IsPropReadable(const long lPropNum)
 //---------------------------------------------------------------------------//
 bool CAddInNative::IsPropWritable(const long lPropNum)
 {
-    switch(lPropNum)
-    { 
-    case ePropIsEnabled:
-        return true;
-    case ePropIsTimerPresent:
-        return false;
+    switch (lPropNum)
+    {
     default:
         return false;
     }
@@ -347,12 +304,6 @@ long CAddInNative::GetNParams(const long lMethodNum)
 { 
     switch(lMethodNum)
     { 
-    case eMethShowInStatusLine:
-        return 1;
-    case eMethLoadPicture:
-        return 1;
-    case eLoopback:
-        return 1;
     case eThreadId:
         return 0;
     case eProcessId:
@@ -375,14 +326,6 @@ bool CAddInNative::GetParamDefValue(const long lMethodNum, const long lParamNum,
 
     switch(lMethodNum)
     { 
-    case eMethEnable:
-    case eMethDisable:
-    case eMethShowInStatusLine:
-    case eMethStartTimer:
-    case eMethStopTimer:
-    case eMethShowMsgBox:
-        // There are no parameter values by default 
-        break;
     default:
         return false;
     }
@@ -394,9 +337,6 @@ bool CAddInNative::HasRetVal(const long lMethodNum)
 { 
     switch(lMethodNum)
     { 
-    case eMethLoadPicture:
-    case eLoopback:
-        return true;
     case eThreadId:
         return true;
     case eProcessId:
@@ -416,91 +356,7 @@ bool CAddInNative::CallAsProc(const long lMethodNum,
                     tVariant* paParams, const long lSizeArray)
 { 
     switch(lMethodNum)
-    {
-    case eMethEnable:
-        m_boolEnabled = true;
-        break;
-    case eMethDisable:
-        m_boolEnabled = false;
-        break;
-    case eMethShowInStatusLine:
-        if (m_iConnect && lSizeArray)
-        {
-            tVariant *var = paParams;
-            m_iConnect->SetStatusLine(var->pwstrVal);
-        }
-        break;
-    case eMethStartTimer:
-        pAsyncEvent = m_iConnect;
-        /* The task of length of turn of messages
-        if (m_iConnect)
-            m_iConnect->SetEventBufferDepth(4000);
-        */
-#if !defined( __linux__ ) && !defined(__APPLE__)
-        m_hTimerQueue = CreateTimerQueue();
-        CreateTimerQueueTimer( &m_hTimer, m_hTimerQueue, 
-            (WAITORTIMERCALLBACK)MyTimerProc, 0, 1000, 1000, 0);
-#else
-        struct sigaction sa;
-        struct itimerval tv;
-        memset(&tv, 0, sizeof(tv));
-
-        sa.sa_handler = MyTimerProc;
-        sigemptyset(&sa.sa_mask);
-        sa.sa_flags = SA_RESTART; 
-        sigaction(SIGALRM, &sa, NULL);
-        tv.it_interval.tv_sec = 1;
-        tv.it_value.tv_sec = 1;
-        setitimer(ITIMER_REAL, &tv, NULL);
-#endif
-        break;
-    case eMethStopTimer:
-#if !defined( __linux__ ) && !defined(__APPLE__)
-        if (m_hTimer != 0)
-        {
-            DeleteTimerQueue(m_hTimerQueue);
-            m_hTimerQueue = 0;
-            m_hTimer = 0;
-        }
-#else
-        alarm(0);
-#endif
-        m_uiTimer = 0;
-        pAsyncEvent = NULL;
-        break;
-    case eMethShowMsgBox:
-        {
-            if(eAppCapabilities1 <= g_capabilities)
-            {
-                IAddInDefBaseEx* cnn = (IAddInDefBaseEx*)m_iConnect;
-                IMsgBox* imsgbox = (IMsgBox*)cnn->GetInterface(eIMsgBox);
-                if (imsgbox)
-                {
-                    IPlatformInfo* info = (IPlatformInfo*)cnn->GetInterface(eIPlatformInfo);
-                    assert(info);
-                    const IPlatformInfo::AppInfo* plt = info->GetPlatformInfo();
-                    if (!plt)
-                        break;
-                    tVariant retVal;
-                    tVarInit(&retVal);
-                    if(imsgbox->Confirm(plt->AppVersion, &retVal))
-                    {
-                        bool succeed = TV_BOOL(&retVal);
-                        WCHAR_T* result = 0;
-                        
-                        if (succeed)
-                            ::convToShortWchar(&result, L"OK");
-                        else
-                            ::convToShortWchar(&result, L"Cancel");
-                        
-                        imsgbox->Alert(result);
-                        delete[] result;
-                        
-                    }
-                }
-            }
-        }
-        break;
+    {    
     default:
         return false;
     }
@@ -511,41 +367,8 @@ bool CAddInNative::CallAsProc(const long lMethodNum,
 bool CAddInNative::CallAsFunc(const long lMethodNum,
                 tVariant* pvarRetValue, tVariant* paParams, const long lSizeArray)
 { 
-    bool ret = false;
-    FILE *file = 0;
-    char *name = 0;
-    int size = 0;
-    char *mbstr = 0;
-    wchar_t* wsTmp = 0;
-    char* loc = 0;
-
     switch(lMethodNum)
     {
-    	
-        // Method acceps one argument of type BinaryData ant returns its copy
-        case eLoopback:
-        {
-            if (lSizeArray != 1 || !paParams)
-                return false;
-
-            if (TV_VT(paParams) != VTYPE_BLOB)
-            {
-                addError(ADDIN_E_VERY_IMPORTANT, L"AddInNative", L"Parameter type mismatch.", -1);
-                return false;
-            }
-
-            if (paParams->strLen > 0)
-            {
-                m_iMemory->AllocMemory((void**)&pvarRetValue->pstrVal, paParams->strLen);
-                memcpy((void*)pvarRetValue->pstrVal, (void*)paParams->pstrVal, paParams->strLen);
-            }
-
-            TV_VT(pvarRetValue) = VTYPE_BLOB;
-            pvarRetValue->strLen = paParams->strLen;
-            return true;
-        }
-        break;
-
         case eThreadId:
         {
             TV_VT(pvarRetValue) = VTYPE_I4;
@@ -586,76 +409,10 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
             strncpy(pvarRetValue->pstrVal, user_name_char, pvarRetValue->strLen);
 
             return true;
-        }
-
-		case eMethLoadPicture:
-        {
-            if (!lSizeArray || !paParams)
-                return false;
-            
-            switch(TV_VT(paParams))
-            {
-            case VTYPE_PSTR:
-                name = paParams->pstrVal;
-                break;
-            case VTYPE_PWSTR:
-                loc = setlocale(LC_ALL, "");
-                ::convFromShortWchar(&wsTmp, TV_WSTR(paParams));
-                size = wcstombs(0, wsTmp, 0)+1;
-                assert(size);
-                mbstr = new char[size];
-                assert(mbstr);
-                memset(mbstr, 0, size);
-                size = wcstombs(mbstr, wsTmp, getLenShortWcharStr(TV_WSTR(paParams)));
-                name = mbstr;
-                setlocale(LC_ALL, loc);
-                delete[] wsTmp;
-                break;
-            default:
-                return false;
-            }
-        }
-                
-        file = fopen(name, "rb");
-
-        if (file == 0)
-        {
-            wchar_t* wsMsgBuf;
-            uint32_t err = errno;
-            name = strerror(err);
-            int sizeloc = mbstowcs(0, name, 0) + 1;
-            assert(sizeloc);
-            wsMsgBuf = new wchar_t[sizeloc];
-            assert(wsMsgBuf);
-            memset(wsMsgBuf, 0, sizeloc * sizeof(wchar_t));
-            sizeloc = mbstowcs(wsMsgBuf, name, sizeloc);
-
-            addError(ADDIN_E_VERY_IMPORTANT, L"AddInNative", wsMsgBuf, RESULT_FROM_ERRNO(err));
-            delete[] wsMsgBuf;
-            return false;
-        }
-
-        fseek(file, 0, SEEK_END);
-        size = ftell(file);
-        
-        if (size && m_iMemory->AllocMemory((void**)&pvarRetValue->pstrVal, size))
-        {
-            fseek(file, 0, SEEK_SET);
-            size = fread(pvarRetValue->pstrVal, 1, size, file);
-            pvarRetValue->strLen = size;
-            TV_VT(pvarRetValue) = VTYPE_BLOB;
-            
-            ret = true;
-        }
-        if (file)
-            fclose(file);
-
-        if (mbstr && size != -1)
-            delete[] mbstr;
-
-        break;
+        }		
     }
-    return ret; 
+	
+    return false; 
 }
 //---------------------------------------------------------------------------//
 // This code will work only on the client!

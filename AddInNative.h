@@ -12,22 +12,12 @@ class CAddInNative : public IComponentBase
 public:
     enum Props
     {
-        ePropIsEnabled = 0,
-        ePropIsTimerPresent,
         ePropLast      // Always last
     };
 
     enum Methods
-    {
-        eMethEnable = 0,
-        eMethDisable,
-        eMethShowInStatusLine,
-        eMethStartTimer,
-        eMethStopTimer,
-        eMethLoadPicture,
-        eMethShowMsgBox,
-		eLoopback,
-        eThreadId,
+    {        
+        eThreadId = 0,
         eProcessId,
         eUserName,
         eHostName,
