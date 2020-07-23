@@ -1,7 +1,0 @@
-LIBRARY    "@Addn_Native@@MySuffix1@@MySuffix2@_@Addn_VERSION@"
-
-EXPORTS
-GetClassObject
-DestroyObject
-GetClassNames
-SetPlatformCapabilities
