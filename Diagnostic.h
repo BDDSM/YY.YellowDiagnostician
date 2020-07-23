@@ -17,6 +17,13 @@
 #include "windows.h"
 #include <Lmcons.h>
 #include <direct.h>
+#include <Lmwksta.h>
+#include <StrSafe.h>
+#include <stdlib.h>  // for _wtoi function
+#include <assert.h>
+#include <lm.h>
+
+#pragma comment(lib, "netapi32.lib")
 
 #define GetCurrentDir _getcwd
 
@@ -37,4 +44,5 @@ namespace yy
 	int get_process_id();
 	int get_thread_id();
 	std::string get_process_name();
+	std::string get_domain_name();
 }

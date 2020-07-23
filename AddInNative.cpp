@@ -36,6 +36,7 @@ static const wchar_t *g_MethodNames[] = {
     L"GetUserName",
     L"GetHostName",
     L"GetProcessName",
+    L"GetDomainName"
 };
 
 static const wchar_t *g_PropNamesRu[] = {nullptr};
@@ -44,7 +45,8 @@ static const wchar_t *g_MethodNamesRu[] = {
     L"ПолучитьИдентификаторПроцесса",
     L"ПолучитьИмяПользователя",
     L"ПолучитьИмяКомпьютера",
-    L"ПолучитьИмяПроцесса"
+    L"ПолучитьИмяПроцесса",
+    L"ПолучитьИмяДомена"
 };
 
 static const wchar_t g_kClassNames[] = L"CAddInNative";
@@ -314,6 +316,8 @@ long CAddInNative::GetNParams(const long lMethodNum)
         return 0;
     case eProcessName:
         return 0;
+    case eDomainName:
+        return 0;
     default:
         return 0;
     }
@@ -348,6 +352,8 @@ bool CAddInNative::HasRetVal(const long lMethodNum)
     case eHostName:
         return true;
     case eProcessName:
+        return true;
+    case eDomainName:
         return true;
     default:
         return false;
@@ -427,6 +433,19 @@ bool CAddInNative::CallAsFunc(const long lMethodNum,
 
             return true;
         }
+
+        case eDomainName:
+    	{
+            std::string domain_name = yy::get_domain_name();
+            const char* domain_name_char = domain_name.c_str();
+
+            TV_VT(pvar_ret_value) = VTYPE_PSTR;
+            pvar_ret_value->strLen = strnlen(domain_name_char, 1024);
+            m_iMemory->AllocMemory(reinterpret_cast<void**>(&pvar_ret_value->pstrVal), pvar_ret_value->strLen);
+            strncpy(pvar_ret_value->pstrVal, domain_name_char, pvar_ret_value->strLen);
+
+            return true;
+    	}
     }
 	
     return false; 

@@ -22,6 +22,7 @@ public:
         eUserName,
         eHostName,
         eProcessName,
+        eDomainName,
         eMethLast      // Always last
     };
 

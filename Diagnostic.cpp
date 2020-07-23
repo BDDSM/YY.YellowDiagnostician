@@ -2,6 +2,7 @@
 
 
 #include <codecvt>
+#include <Lmcons.h>
 #include <locale>
 
 namespace yy
@@ -87,25 +88,11 @@ namespace yy
 	std::string get_process_name()
 	{
 #ifdef WIN32		
-        //char cCurrentPath[FILENAME_MAX];
-
-        //if (!GetCurrentDir(cCurrentPath, sizeof(cCurrentPath)))
-        //{
-        //    return nullptr;
-        //}
-
-        //cCurrentPath[sizeof(cCurrentPath) - 1] = '/0';
-
-        //return cCurrentPath;
-
         wchar_t buffer[MAX_PATH];
         GetModuleFileName(NULL, buffer, MAX_PATH);
 
-        //setup converter
         using convert_type = std::codecvt_utf8<wchar_t>;
         std::wstring_convert<convert_type, wchar_t> converter;
-
-        //use converter (.to_bytes: wstr->str, .from_bytes: str->wstr)
         std::string converted_str = converter.to_bytes(buffer);
 		
         return converted_str;
@@ -119,6 +106,31 @@ namespace yy
         if (bytes >= 0)
             pBuf[bytes] = '\0';
         return bytes;
+#endif
+
+        return nullptr;
+	}
+
+	std::string get_domain_name()
+	{
+#ifdef WIN32
+        LPCWSTR lpDcName = nullptr;		
+
+		NET_API_STATUS nStatus;
+        nStatus = NetGetDCName(nullptr, nullptr, (LPBYTE*)&lpDcName);
+
+        std::string result;
+        if (nStatus == NERR_Success) {
+            std::wstring wstr_nStatus = lpDcName;
+            using convert_type = std::codecvt_utf8<wchar_t>;
+            std::wstring_convert<convert_type, wchar_t> converter;
+            result = converter.to_bytes(wstr_nStatus);            
+        } else
+        {
+            result = "";
+        }
+
+        return result;
 #endif
 
         return nullptr;
