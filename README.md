@@ -1,5 +1,7 @@
 # YellowDiagnostician
 
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/YPermitin/YY.YellowDiagnostician/blob/master/LICENSE)
+
 Экспериментальная внешняя компонента для платформы 1С:Предприятие 8.x с некоторыми функциями для расширенной диагностики работы как самой платформы, так и ее работы с конкретным окружением.
 
 ## Поддерживаемые системы
