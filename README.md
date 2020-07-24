@@ -104,6 +104,12 @@
 ```
 Пока что все :)
 
+## Сборка проекта через Visual Studio для Windows
+
+1. Запустить проект [YY.YellowDiagnostician](YY.YellowDiagnostician.sln) 
+2. Скомпилировать проект через f5
+3. Profit! :)
+
 ## TODO
 
 * Добавить версию для Linux
